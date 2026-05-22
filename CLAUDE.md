@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-Package manager: **Bun** (`bun.lockb` present, `bunfig.toml` configured). `npm` also works since this is a standard Node project.
+Package manager: **Bun is the intended PM** (`bun.lockb` + `bunfig.toml`), but on this Windows dev machine `bun` is not on PATH — use `npm` as the practical fallback. `npm` runs scripts fine, but it **fails to install packages that publish `workspace:*` protocol deps** (see "External integrations" below). If you hit that, the answer is usually to avoid the package, not to install bun.
 
-- `bun dev` — start Vite dev server (defaults to port 8080; falls back to next free port)
-- `bun run build` — production build (Cloudflare Workers target)
-- `bun run build:dev` — build with development mode optimizations
-- `bun run preview` — preview the production build locally
-- `bun run lint` — ESLint over the whole repo
-- `bun run format` — Prettier write across the repo
+- `npm run dev` (or `bun dev`) — Vite dev server (defaults to port 8080; falls back to next free port if 8080 is busy)
+- `npm run build` — production build (Cloudflare Workers target)
+- `npm run build:dev` — build with development mode optimizations
+- `npm run preview` — preview the production build locally
+- `npm run lint` — ESLint over the whole repo
+- `npm run format` — Prettier write across the repo
 
 No test framework is configured.
 
@@ -58,6 +58,10 @@ Custom tokens beyond the standard shadcn set: `--gradient-hero` (used by the hom
 
 Cloudflare Workers via Wrangler. `wrangler.jsonc` sets `compatibility_flags: ["nodejs_compat"]` and points `main` at TanStack Start's server entry — the Vite build emits the Worker bundle.
 
+### External integrations
+
+- **Cal.id scheduler** on `/contact` (`src/routes/contact.tsx`). It uses the **vanilla embed script** from `https://cal.id/embed-link/embed.js`, loaded inside a `useEffect` and mounted into `<div id="cal-inline">`. Do **not** try to install `@calid/react-embed` — the published `0.0.2` references `workspace:*` deps and npm install fails with `EUNSUPPORTEDPROTOCOL`. The vanilla embed gives the same behavior with one fewer dependency. If you need to change the cal link or the brand color, edit the `useEffect` body. Configuration currently uses `calLink: "movementsindia/connect-with-founder"`, namespace `"default"`, and `cal-brand: #007ee5` (a default blue — does not match the site's earth-tone palette, change to `--accent` / `--primary` if a brand-match is requested).
+
 ## Workflow: commit and push as you work
 
 **Standing instruction from the repo owner** (overrides the default "only commit when asked" behavior — applies to this repo only):
@@ -78,6 +82,6 @@ Steps:
 - Group by intent: `Add`, `Fix`, `Refactor`, `Remove`, `Update`, `Docs`. No emojis, no Conventional Commits prefix required.
 - Don't reference task numbers or chat turns ("as requested", "per user") — the commit should make sense to someone reading `git log` six months from now.
 
-The repo's git identity is configured globally (`samyakgyan1008 <samyakgyanpracharprasartrust@gmail.com>`), so commits will be authored correctly without any extra setup.
+The repo's git identity is configured globally (`samyakgyan1008 <samyakgyanpracharprasartrust@gmail.com>`), so commits will be authored correctly without any extra setup. Remote is `origin → https://github.com/samyakgyan1008/movements-consulting` (HTTPS, authenticated via the `gh` credential helper).
 
 **Never** force-push, amend an already-pushed commit, or skip hooks unless the owner explicitly asks. If a push is rejected (someone else pushed first), pull/rebase rather than overwriting.
