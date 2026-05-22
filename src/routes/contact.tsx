@@ -1,19 +1,68 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect } from "react";
 import { Mail, Phone, MapPin, Linkedin } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact — Movements Consulting" },
-      { name: "description", content: "Send an email. Tell me, in whatever words feel right, what you are navigating." },
+      { name: "description", content: "Book a conversation with Deepak — or send an email. No sales call." },
     ],
   }),
   component: ContactPage,
 });
 
+declare global {
+  interface Window {
+    Cal?: any;
+  }
+}
+
 function ContactPage() {
-  const [submitted, setSubmitted] = useState(false);
+  useEffect(() => {
+    (function (C: any, A: string, L: string) {
+      const p = function (a: any, ar: any) { a.q.push(ar); };
+      const d = C.document;
+      C.Cal =
+        C.Cal ||
+        function (...ar: any[]) {
+          const cal = C.Cal;
+          if (!cal.loaded) {
+            cal.ns = {};
+            cal.q = cal.q || [];
+            d.head.appendChild(d.createElement("script")).src = A;
+            cal.loaded = true;
+          }
+          if (ar[0] === L) {
+            const api: any = function (...args: any[]) { p(api, args); };
+            const namespace = ar[1];
+            api.q = api.q || [];
+            if (typeof namespace === "string") {
+              cal.ns[namespace] = cal.ns[namespace] || api;
+              p(cal.ns[namespace], ar);
+              p(cal, ["initNamespace", namespace]);
+            } else p(cal, ar);
+            return;
+          }
+          p(cal, ar);
+        };
+    })(window, "https://cal.id/embed-link/embed.js", "init");
+
+    window.Cal("init", "default", { origin: "https://cal.id" });
+    window.Cal.ns.default("inline", {
+      elementOrSelector: "#cal-inline",
+      calLink: "movementsindia/connect-with-founder",
+      layout: "month_view",
+    });
+    window.Cal.ns.default("ui", {
+      cssVarsPerTheme: {
+        light: { "cal-brand": "#007ee5" },
+        dark: { "cal-brand": "#fafafa" },
+      },
+      hideEventTypeDetails: false,
+      layout: "month_view",
+    });
+  }, []);
 
   return (
     <div>
@@ -35,43 +84,11 @@ function ContactPage() {
         </div>
 
         <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
-          {/* Optional short form */}
-          <div className="rounded-xl border border-border bg-card p-8">
-            <p className="text-xs uppercase tracking-[0.3em] text-accent mb-2">Or, if you prefer a form</p>
-            <h2 className="font-serif text-2xl mb-6">Send a short note instead.</h2>
-            {submitted ? (
-              <div className="py-8 text-center">
-                <h3 className="font-serif text-2xl mb-3">Thank you.</h3>
-                <p className="text-muted-foreground">I'll be in touch within 24 hours on working days.</p>
-              </div>
-            ) : (
-              <form
-                onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }}
-                className="space-y-4"
-              >
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Field label="Your name" id="name" required />
-                  <Field label="Email" id="email" type="email" required />
-                </div>
-                <Field label="Role / Organisation (optional)" id="role" />
-                <div>
-                  <label htmlFor="message" className="text-sm font-medium mb-1 block">
-                    What are you navigating?<span className="text-accent"> *</span>
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={5}
-                    required
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    placeholder="A few lines on what is happening — and what you are hoping to find clarity on."
-                  />
-                </div>
-                <button type="submit" className="w-full rounded-md bg-primary py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-                  Send the note
-                </button>
-              </form>
-            )}
+          {/* Cal.id inline scheduler */}
+          <div className="rounded-xl border border-border bg-card p-2 overflow-hidden">
+            <p className="text-xs uppercase tracking-[0.3em] text-accent mb-2 px-4 pt-4">Or, book a time directly</p>
+            <h2 className="font-serif text-2xl mb-4 px-4">Pick a slot that works for you.</h2>
+            <div id="cal-inline" style={{ width: "100%", height: "720px", overflow: "auto" }} />
           </div>
 
           {/* Contact details */}
@@ -150,23 +167,6 @@ function ContactPage() {
           <footer className="mt-3 text-sm text-muted-foreground not-italic">— Deepak Lal</footer>
         </blockquote>
       </section>
-    </div>
-  );
-}
-
-function Field({ label, id, type = "text", required }: { label: string; id: string; type?: string; required?: boolean }) {
-  return (
-    <div>
-      <label htmlFor={id} className="text-sm font-medium mb-1 block">
-        {label}{required && <span className="text-accent"> *</span>}
-      </label>
-      <input
-        id={id}
-        name={id}
-        type={type}
-        required={required}
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      />
     </div>
   );
 }
