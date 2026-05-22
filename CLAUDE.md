@@ -7,9 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Package manager: **Bun is the intended PM** (`bun.lockb` + `bunfig.toml`), but on this Windows dev machine `bun` is not on PATH — use `npm` as the practical fallback. `npm` runs scripts fine, but it **fails to install packages that publish `workspace:*` protocol deps** (see "External integrations" below). If you hit that, the answer is usually to avoid the package, not to install bun.
 
 - `npm run dev` (or `bun dev`) — Vite dev server (defaults to port 8080; falls back to next free port if 8080 is busy)
-- `npm run build` — production build (Cloudflare Workers target)
+- `npm run build` — production build (Node server target; emits `dist/client/` + `dist/server/server.js`)
 - `npm run build:dev` — build with development mode optimizations
 - `npm run preview` — preview the production build locally
+- `npm start` — run the production Node server (`server.mjs`); reads `PORT` env var (default 3000)
 - `npm run lint` — ESLint over the whole repo
 - `npm run format` — Prettier write across the repo
 
@@ -17,16 +18,18 @@ No test framework is configured.
 
 ## Architecture
 
-This is a **TanStack Start** marketing site (Movements Consulting) running on **Vite** and deployed to **Cloudflare Workers** (`wrangler.jsonc`, `main: "@tanstack/react-start/server-entry"`).
+This is a **TanStack Start** marketing site (Movements Consulting) running on **Vite**, deployed as a **Node.js app on Hostinger Cloud** (`movementsindia.com`). Hostinger pulls from GitHub and runs `npm install && npm run build`, then launches `npm start` → `server.mjs`.
 
 ### Vite config is locked
 
-`vite.config.ts` is a single line: `defineConfig()` from `@lovable.dev/vite-tanstack-config`. That preset already wires up:
+`vite.config.ts` is one line: `defineConfig({ cloudflare: false })` from `@lovable.dev/vite-tanstack-config`. That preset already wires up:
 
 - `tanstackStart`, `viteReact`, `tailwindcss`, `tsConfigPaths`
-- Cloudflare plugin (build-only) and componentTagger (dev-only)
+- componentTagger (dev-only)
 - `VITE_*` env injection, the `@/` path alias, React/TanStack dedupe
 - Dev server port/host/strictPort and sandbox detection
+
+`cloudflare: false` is **load-bearing** — it disables the Cloudflare Vite plugin so the build emits a portable Node SSR bundle at `dist/server/server.js` (exporting a default Web `fetch` handler) plus client assets in `dist/client/`. Re-enabling the Cloudflare plugin would switch the output back to a Worker bundle, which Hostinger can't run.
 
 **Do not add these plugins manually** — duplicates will break the app. If you need to extend Vite, use `defineConfig({ vite: { ... } })`.
 
@@ -56,7 +59,21 @@ Custom tokens beyond the standard shadcn set: `--gradient-hero` (used by the hom
 
 ### Deployment
 
-Cloudflare Workers via Wrangler. `wrangler.jsonc` sets `compatibility_flags: ["nodejs_compat"]` and points `main` at TanStack Start's server entry — the Vite build emits the Worker bundle.
+**Hostinger Cloud (Node.js)** — production host. Configure the Node.js app in Hostinger's panel:
+
+- Application root: repo root
+- Node version: 20.x or higher (matches `engines.node` in `package.json`)
+- Build command: `npm install && npm run build`
+- Start command: `npm start`
+- Application URL: `movementsindia.com`
+
+`server.mjs` (at repo root) is the Node entrypoint. It uses `srvx` to:
+
+1. Serve static client assets from `dist/client/` via `serveStatic` middleware
+2. Fall through to the SSR `fetch` handler (default export of `dist/server/server.js`) for everything else
+3. Bind to `process.env.PORT` (Hostinger sets this) on `0.0.0.0`
+
+If Hostinger's deploy logs show a 502 or "app failed to start," the usual causes are: Node version too low (must be ≥20), build step didn't run (no `dist/`), or `srvx` missing from `dependencies` (it's an explicit dep — don't let upgrades drop it).
 
 ### External integrations
 
