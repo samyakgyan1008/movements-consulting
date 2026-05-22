@@ -83,53 +83,52 @@ function ContactPage() {
           <p className="italic text-foreground/70">I read every email personally and reply within 24 hours on working days.</p>
         </div>
 
-        <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
-          {/* Cal.id inline scheduler */}
+        <div className="space-y-10">
+          {/* Cal.id inline scheduler — full width */}
           <div className="rounded-xl border border-border bg-card p-2 overflow-hidden">
             <p className="text-xs uppercase tracking-[0.3em] text-accent mb-2 px-4 pt-4">Or, book a time directly</p>
             <h2 className="font-serif text-2xl mb-4 px-4">Pick a slot that works for you.</h2>
             <div id="cal-inline" style={{ width: "100%", height: "720px", overflow: "auto" }} />
           </div>
 
-          {/* Contact details */}
-          <aside className="space-y-6">
-            <div className="rounded-xl border border-border bg-card p-6">
-              <h3 className="font-serif text-xl mb-5">Contact details</h3>
-              <ul className="space-y-4 text-sm">
-                <li className="flex items-start gap-3">
-                  <Mail className="h-4 w-4 mt-1 text-accent shrink-0" />
-                  <div>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Email</p>
-                    <a href="mailto:deepak@movementsindia.com" className="hover:text-primary">deepak@movementsindia.com</a>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Phone className="h-4 w-4 mt-1 text-accent shrink-0" />
-                  <div>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Mobile</p>
-                    <a href="tel:+919908438744" className="hover:text-primary">+91 99084 38744</a>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <MapPin className="h-4 w-4 mt-1 text-accent shrink-0" />
-                  <div>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Location</p>
-                    <span>Hyderabad / Delhi, India</span>
-                  </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Linkedin className="h-4 w-4 mt-1 text-accent shrink-0" />
-                  <div>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">LinkedIn</p>
-                    <span className="text-foreground/80">Deepak Lal · Movements (Company Page)</span>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div className="rounded-xl border border-accent/30 bg-accent/5 p-6">
-              <p className="text-sm italic text-foreground/80">"Not a sales call. A real one."</p>
-            </div>
-          </aside>
+          {/* Contact details — full width below */}
+          <div className="rounded-xl border border-border bg-card p-6 md:p-8">
+            <h3 className="font-serif text-xl mb-6">Contact details</h3>
+            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+              <li className="flex items-start gap-3">
+                <Mail className="h-4 w-4 mt-1 text-accent shrink-0" />
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Email</p>
+                  <a href="mailto:deepak@movementsindia.com" className="hover:text-primary break-all">deepak@movementsindia.com</a>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <Phone className="h-4 w-4 mt-1 text-accent shrink-0" />
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Mobile</p>
+                  <a href="tel:+919908438744" className="hover:text-primary">+91 99084 38744</a>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <MapPin className="h-4 w-4 mt-1 text-accent shrink-0" />
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Location</p>
+                  <span>Hyderabad / Delhi, India</span>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <Linkedin className="h-4 w-4 mt-1 text-accent shrink-0" />
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">LinkedIn</p>
+                  <span className="text-foreground/80">Deepak Lal · Movements (Company Page)</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-xl border border-accent/30 bg-accent/5 p-6 max-w-md">
+            <p className="text-sm italic text-foreground/80">"Not a sales call. A real one."</p>
+          </div>
         </div>
 
         {/* What to expect */}
