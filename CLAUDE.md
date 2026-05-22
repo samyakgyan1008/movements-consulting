@@ -57,3 +57,27 @@ Custom tokens beyond the standard shadcn set: `--gradient-hero` (used by the hom
 ### Deployment
 
 Cloudflare Workers via Wrangler. `wrangler.jsonc` sets `compatibility_flags: ["nodejs_compat"]` and points `main` at TanStack Start's server entry — the Vite build emits the Worker bundle.
+
+## Workflow: commit and push as you work
+
+**Standing instruction from the repo owner** (overrides the default "only commit when asked" behavior — applies to this repo only):
+
+After every meaningful chunk of work, commit the changes and push to `origin/main` so progress is never lost. "Meaningful chunk" = a coherent change that leaves the code in a working state (a finished feature, fix, refactor, content update, or doc change). Don't commit after every individual file edit; group related edits into one commit. Don't commit broken or half-finished work.
+
+Steps:
+
+1. `git status` + `git diff` to confirm what you're about to commit.
+2. `git add` only the files relevant to the change (avoid `git add -A` so stray files don't sneak in).
+3. `git commit -m "<message>"` — see message style below.
+4. `git push origin main` — the repo uses HTTPS with the `gh` credential helper, so no password prompt.
+
+**Commit message style** (clean = short, specific, and about *why*):
+
+- One line, imperative mood, ≤ 72 chars. Add a blank line + body only when the *why* needs explanation.
+- Lead with the change, not the file. `Fix logo distortion in sidebar header` beats `Update AppSidebar.tsx`.
+- Group by intent: `Add`, `Fix`, `Refactor`, `Remove`, `Update`, `Docs`. No emojis, no Conventional Commits prefix required.
+- Don't reference task numbers or chat turns ("as requested", "per user") — the commit should make sense to someone reading `git log` six months from now.
+
+The repo's git identity is configured globally (`samyakgyan1008 <samyakgyanpracharprasartrust@gmail.com>`), so commits will be authored correctly without any extra setup.
+
+**Never** force-push, amend an already-pushed commit, or skip hooks unless the owner explicitly asks. If a push is rejected (someone else pushed first), pull/rebase rather than overwriting.
